@@ -1,0 +1,98 @@
+<%
+if (!usercfg.updated) return;
+
+if (!usercfg.themeconfig) usercfg.themeconfig = theme;
+
+hexo.__ = function(item){
+  return function(str,opt){
+    var s = __(item?item + '.' + str:str);
+    if (item && s == item + '.' + str)
+      return (opt===false?false:str);
+    return s?s:(opt===false?false:str);
+  }
+}
+
+var configWidgets = function(widgets){
+  for(var k in widgets){
+    var w=widgets[k];
+    if (w){
+      w.forEach(function(n,i){
+        if (typeof n !== 'object'){
+          var y=n.indexOf(',');
+          if (y > 0) w[i]={name: n.substr(0,y),options: JSON.parse(n.slice(y+1))};
+        }
+      })
+    }
+  }
+}
+
+this.iTags = {};
+
+iTags.ilink = function(match,content,br){
+  var data = {},posts;
+  var ilink_args = /(\w+)\s*:\s*(.+)$/.exec(content);
+  var attr = ilink_args[1];
+  var f = ilink_args[2];
+  if (attr == 'tag'){posts = site.tags;data['name'] = f;}else if (attr == 'cat' || attr == 'category'){posts = site.categories;data['name'] = f;}else{posts = site.posts;data[attr] = f;}
+  var post = posts.findOne(data);
+  return post?'<a href=\"' + config.root + post.path +'" target="_blank">' + (post.title?post.title:f) + '</a>' + (br?'<br>':''):'';
+};
+
+iTags.ijs = function(match,content){
+  return eval(content);
+};
+
+var oldDate = site.posts.sort('date',0).first().date.format('YYYY');
+var newDate = new Date().getFullYear();
+
+if (oldDate < newDate) usercfg.SiteDate = oldDate + '-' + newDate;
+else usercfg.SiteDate = newDate;
+
+var load_static_widgets = function(name,options){
+  if (UserConfig.ajax_widgets) return "<div data-src='"+ name +"' class='ajax_widgets'>正在加载...</div>";
+  return _partial('_widgets/static/' + name,{name: name,options: options});
+}
+
+var load_widgets = function(name,item,index){
+    if (name.search('_') >= 0 && index)	return "";
+
+    var str="<section id='" + name + "_widget'>";
+    var widgets = [];
+    var theme_widgets = [];
+
+    if (UserConfig.widgets && UserConfig.widgets[name]) theme_widgets = UserConfig.widgets[name];
+
+    if (item && item.widgets && item.widgets[name]){
+        item.widgets[name].forEach(function(widget){
+            if (widget == '+'){//+代表加载主题指定的widgets
+                theme_widgets.forEach(function(n){
+                    if (widgets.indexOf(widget) == -1) widgets.push(n);
+                })
+            }
+            else if (widgets.indexOf(widget) == -1) widgets.push(widget);
+        })
+        
+    } else if (!item || ((!item.widgets || item.widgets.theme !== false) && (item.layout !== 'page' || name.search('_') < 0))){//对于页面默认不加载文章前后相关的widgets
+        widgets = widgets.concat(theme_widgets);
+    }
+
+    widgets.forEach(function(widget){
+        var widget_cfg = {pos: name,item: item,name: widget,options: {}};
+        if (typeof widget === 'object'){
+          widget_cfg = _.extend(widget_cfg,widget);
+        }
+        str += '<div class="widget" id="widget_' + name + '_' + widget_cfg.name + '>">';
+        str += _partial('_widgets/' + widget_cfg.name,widget_cfg);
+        str += '</div>';
+    });
+
+    str +='</section>';
+    return str;
+}
+
+this.UserConfig = _.extend({ajax_widgets: true,load_widgets: load_widgets,load_static_widgets: load_static_widgets},hexo.config,usercfg,usercfg.themeconfig);
+
+configWidgets(this.UserConfig.widgets);
+
+usercfg.updated = false;
+%>

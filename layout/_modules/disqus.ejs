@@ -1,0 +1,10 @@
+<!-- disqus Comment Script BEGIN -->
+<script type="text/javascript">
+var disqus_shortname = '<%- UserConfig.comments.short_name %>';
+<% if (page.thread) {%>
+var disqus_identifier='<%=page.thread%>';
+<%}%>
+var disqus_url = '<%=url%>';
+_js2load.push({src:'http://' + disqus_shortname + '.disqus.com/embed.js'});
+</script>
+<!-- disqus Comment Script END -->

@@ -1,0 +1,21 @@
+<%if (!item.photos || !item.photos.length) return;%>
+<div id="carousel-captions" class="carousel slide" data-interval='3000' data-carousel=0 data-ride="carousel">
+  <ol class="carousel-indicators">
+  <%for(var i=0;i<item.photos.length;++i){%>
+    <li data-target="#carousel-captions" data-slide-to="<%-i%>" <%-i==0?'class="active"':''%>></li>
+  <%}%>
+  </ol>
+  <div class="carousel-inner">
+    <%item.photos.forEach(function(photo,index){var item = photo.split('>>'); -%>
+    <div class="item<%- index==0?' active':''%>">
+      <img src="<%-RealPath(item[0])%>">
+      <div class="carousel-caption">
+        <h3><%- item[1]%></h3>
+        <p><%- item[2]%></p>
+      </div>
+    </div>
+    <%}); -%>
+  </div>
+  <a class="left carousel-control" href="#carousel-captions" data-slide="prev"><span class="fa fa-chevron-left"></span></a>
+  <a class="right carousel-control" href="#carousel-captions" data-slide="next"><span class="fa fa-chevron-right"></span></a>
+</div>

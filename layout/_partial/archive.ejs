@@ -1,0 +1,82 @@
+<%
+partial('module');
+var title = '';
+var sub_cats = [];
+if (page.category)
+{
+    title = page.category;
+    var cur_category = site.categories.findOne({name: page.category});
+    site.categories.sort('name').each(function(item,i){
+	if (item.parent && item.parent == cur_category._id)
+        sub_cats.push('<a href="'+ config.root + item.path +'"><span class="label label-'+ UserConfig.twbs_sty(i) +'">'+item.name+'<span class="badge">'+ item.length +'</span></span></a>');
+    });
+    title += '<small>' + sub_cats.join(' ') + '</small>';
+}
+if (page.tag) title = page.tag;
+if (page.archive){
+  if (page.year) title = page.year + (page.month ? '/' + page.month : '');
+  else title = __('archive_a');
+}
+%>
+<h2 class="archive-title<% if (page.tag){ %> tag<% } else if (page.category){ %> category<% } %>"><%- title %></h2>
+
+<% if (pagination == 2){ %>
+  <% page.posts.each(function(item){ %>
+    <%- partial('article', {item: item, index: true}) %>
+  <% }); %>
+  <%- partial('pagination') %>
+<%return;}%>
+<div class="archive">
+<%
+var posts = page.posts.sort('date',-1);
+var item_data = '';
+var item_year = '';
+var item_arr = {};
+
+posts.each(function(item,id){
+  var this_year = item.date.year();
+  if (this_year != item_year){
+    if (item_data.length){
+      item_data += '</ul>';
+      item_arr[item_year]= item_data;
+    }
+    item_year = this_year;
+    item_data='<ul class="list-group">';
+  }
+  item_data +='<li class="list-group-item">';
+  item_data +='<h3><time datetime="' + item.date.toDate().toISOString() + '">' + item.date.format(UserConfig.date_format) +'</time>  ';
+  item_data +=partial('post/title',{item: item,index: true});
+  item_data +='</h3>';
+  if (!item.description){
+    if (item.excerpt) item.description = item.excerpt;
+    else if (typeof(auto_keyword_desc) == 'function'){
+      var desc = auto_keyword_desc(item.raw.substr(item.raw.search('---') + 5));
+      var t = desc.match(/content="(.*?)"/);
+      if (t) item.description = t[1];
+    }
+  }
+  if (item.description) item_data += '<p class="list-group-item-text">' + item.description + '</p>';
+})
+item_arr[item_year] = item_data;
+var show_all = (posts.length <= 10);
+var item_keys = Object.keys(item_arr);
+if (item_keys.length == 1){%>
+  <%- item_arr[item_keys[0]]%>
+<%}else{
+var nav_tabs = ['<li id="show_all_contents"' +(show_all?'class="active"':'') +'><a href="#" data-toggle="pill">全部</a></li>'];
+var tab_contents = [];
+for(item in item_arr){
+  nav_tabs.push('<li class="'+((!show_all && item == item_year)?' active':'')+'"><a href="#year_'+item+'" data-toggle="pill">'+item+'</a></li>');
+  tab_contents.push('<div ' + (show_all?'':'class="tab-pane fade'+(item == item_year?' in active"':'"'))+' id="year_'+item+'">'+item_arr[item]+'</div>');
+}
+%>
+<!-- Nav tabs -->
+<ul class="nav nav-pills">
+<%- nav_tabs.join('')%>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+<%- tab_contents.join('')%>
+</div>
+<%}%>
+</div>

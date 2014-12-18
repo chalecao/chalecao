@@ -1,0 +1,6 @@
+<%-UserConfig.load_static_widgets(name,options)%>
+<% if (!cache) { %>
+    <script type="text/javascript">
+	var cats = <%- hexo.__dump(site.categories)%>;
+    </script>
+<% } %>

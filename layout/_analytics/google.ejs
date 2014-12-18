@@ -1,0 +1,7 @@
+<%if (!mod_info) return;%>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '<%- mod_info %>']);
+  _gaq.push(['_trackPageview']);
+  _js2load.push({src:('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'});
+</script>

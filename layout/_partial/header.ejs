@@ -1,0 +1,61 @@
+<nav id="main-nav" class="navbar navbar-default hm-navbar-menu-left  <% if (UserConfig.bs_nav_inverse) { %>navbar-inverse <%}%>" role="navigation">
+    <div class="hm-navbar-header">
+    <a href="<%- UserConfig.url %>" ><img class="hm-logo" src="<%- UserConfig.logo_url %>" title="<%- UserConfig.title %>" width="64" height="64" /></a>
+    <br/>|<br/><span class="fa fa-tint hm-black shine_blue" ></span><br/>|<br/><span class="fa fa-heart hm-black shine_red" ></span><br/>|<br/>
+        <i class="fa fa-bars fa-2x hm-black hm-menu shine_blue" ></i><br/><div class="hm-line"></div>
+    </div>
+    <div class="collapse navbar-collapse">
+      <h1 style="color:black"><%- UserConfig.title %></h1>
+      <ul class="nav navbar-nav hm-left-nav">
+  <%  for (var i in UserConfig.menu) {
+    if ( Object.prototype.toString.call(UserConfig.menu[i] ) === '[object Object]' ) {
+    %>
+      <li class='dropdown'>
+        <a class='dropdown-toggle' data-toggle='dropdown' href='#'><%= i %><b class='caret'></b></a>
+        <ul class='dropdown-menu'>
+    <%      for (var j in UserConfig.menu[i]) { %>
+          <li><%-link_to(RealPath(UserConfig.menu[i][j]),__(j)) -%></li>
+    <%      } %>
+        </ul>
+      </li>
+    <%} else {%>
+        <li item='<%-path%>' <%if(page.path.toLowerCase().indexOf(UserConfig.menu[i].toLowerCase())==0){%>class='active'<%}%>><%-link_to(RealPath(UserConfig.menu[i]),__(i)) -%></li>
+      <%  }
+  }%>
+      </ul>
+
+        <% UserConfig.widgets.left_menu.forEach(function(widget){
+            var widget_cfg = {name: widget,options: {}};
+            if (typeof widget === 'object'){
+                widget_cfg = _.extend(widget_cfg,widget);
+            }
+            var title = hexo.__('widgets')(widget_cfg.name,false);%>
+        <div id="widget_<%- widget %>" class="widget hm-left-widget">
+            <%- title?'<div class="panel-heading">' + title + '：</div>':'' -%>
+            <%- _partial('../_widgets/' + widget_cfg.name,widget_cfg) -%>
+        </div><%if (!cache && hexo.debug){%><!--widget_<%- widget_cfg.name %>--><%}%>
+        <% }); %>
+
+
+      <ul class="nav navbar-nav navbar-right">
+      <% if (UserConfig.rss) { %>
+        <li><a href="<%- RealPath(UserConfig.rss) %>">RSS</a></li>
+      <% } %>
+      <% if (UserConfig.twitter && UserConfig.twitter.username) { %>
+        <li><a href="https://twitter.com/<%- UserConfig.twitter.username %>">twitter</a></li>
+      <% } else if (UserConfig.twitter_id) { %>
+        <li><a href="https://twitter.com/<%- UserConfig.twitter_id %>">twitter</a></li>
+      <% } %>
+      <% if (UserConfig.facebook_id) { %>
+        <li><a href="https://www.facebook.com/<%- UserConfig.facebook_id %>">facebook</a></li>
+      <% } %>
+      <% if (UserConfig.linked_id) { %>
+        <li><a href="http://www.linkedin.com/in/<%- UserConfig.linkedin_id %>">linkedin</a></li>
+      <% } %>
+      <% if (UserConfig.github_id) { %>
+        <li><a href="https://github.com/<%- UserConfig.github_id %>">github</a></li>
+      <% } %>
+      </ul>
+    </div>
+</nav>
+<div class="clearfix"></div>

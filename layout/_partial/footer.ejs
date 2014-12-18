@@ -1,0 +1,20 @@
+<div class="panel-footer">
+  <div id="site-info">
+    <span class='author'>
+  <% if (config.author){ %>
+  &copy; <%= UserConfig.SiteDate %> <%= config.author %>
+  <% } else { %>
+  &copy; <%= UserConfig.SiteDate %> <%= UserConfig.title %>
+  <% } %>
+    &nbsp;&nbsp;</span>
+  <% if (UserConfig.Beian) {%><a href='http://www.miibeian.gov.cn/'><%-UserConfig.Beian%></a></span><%}%>
+  <% if (UserConfig.analytics && UserConfig.analytics.provider) {
+       var provider = UserConfig.analytics.provider.split(',');
+       provider.forEach(function(t){
+     %><span id='analytics-<%-t%>'><%- partial('../_analytics/'+t,{mod_info:UserConfig.analytics[t]}) -%></span><%
+       })
+  }%>
+  </div>
+  <div id="copyright">Blog powered by <a href='http://www.haomou.net/' <%if (hexo.env.version){%> title="本站由hexo V<%- hexo.env.version%> 生成"<%}%>><strong>hexo</strong></a> Theme <strong><a href='http://www.haomou.net/'>Chale V1.0</a></strong><span class="pull-right"> 更新时间: <em><%-time(page.updated,'YYYY-MM-DD HH:mm:ss')%></em></span></div>
+</div>
+<div class="clearfix"></div>
